@@ -1,0 +1,32 @@
+# maven #
+target
+
+logs
+
+# windows #
+Thumbs.db
+
+# Mac #
+.DS_Store
+
+# eclipse #
+.settings
+.project
+.classpath
+.log
+*.class
+
+# idea #
+.idea
+*.iml
+hs_err_pid*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+/target
+/etllog/
+/file/
+/toyota-quality/file/
+/.template/
