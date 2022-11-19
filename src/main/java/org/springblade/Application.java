@@ -16,6 +16,7 @@
  */
 package org.springblade;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springblade.common.constant.CommonConstant;
 import org.springblade.core.launch.BladeApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +39,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 	}
 
 )
+@MapperScan(value = {"org.springblade.**.mapper"})
 public class Application {
 
 	public static void main(String[] args) {

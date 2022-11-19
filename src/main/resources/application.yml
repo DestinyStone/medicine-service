@@ -19,7 +19,7 @@ spring:
     #driver-class-name: org.postgresql.Driver
     #driver-class-name: oracle.jdbc.OracleDriver
     #driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: jdbc:mysql://111.67.206.244:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/quality?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
     username: root
     password: 123456
     druid:
@@ -49,10 +49,10 @@ spring:
         session-stat-max-count: 10
   redis:
     ##redis 单机环境配置
-    host: 111.67.206.244
+    host: 192.168.1.205
     port: 6379
-    password:
-    database: 0
+    password: 123456
+    database: 7
     ssl: false
 
 # mybatis
