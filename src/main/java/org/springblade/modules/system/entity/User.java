@@ -92,5 +92,9 @@ public class User extends TenantEntity {
 	 */
 	private String postId;
 
+	/**
+	 * 积分
+	 */
+	private String score;
 
 }
