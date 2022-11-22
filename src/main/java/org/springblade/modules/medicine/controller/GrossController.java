@@ -7,19 +7,20 @@ import org.springblade.common.constant.ApiConstant;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
+import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.medicine.entity.GrossDict;
-import org.springblade.modules.medicine.entity.Medicine;
 import org.springblade.modules.medicine.service.GrossDictService;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springblade.modules.medicine.vo.GrossDictVO;
-import org.springblade.modules.medicine.vo.MedicineVO;
 import org.springblade.modules.medicine.wrapper.GrossDictWrapper;
-import org.springblade.modules.medicine.wrapper.MedicineWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @Author: zhouxiaofeng
@@ -46,5 +47,16 @@ public class GrossController {
         wrapper.like(StringUtil.isNotBlank(vo.getName()), GrossDict::getName, vo.getName());
         IPage<GrossDict> page = grossDictService.page(Condition.getPage(query), wrapper);
         return R.data(GrossDictWrapper.build().pageVO(page));
+    }
+
+    /**
+     * 查询字典
+     */
+    @GetMapping("/list")
+    public R<List<GrossDictVO>> list(@RequestParam(value = "excludeIds", required = false) String ids) {
+        LambdaQueryWrapper<GrossDict> wrapper = new LambdaQueryWrapper<>();
+        wrapper.notIn(StringUtil.isNotBlank(ids), GrossDict::getId, Func.toLongList(ids));
+        List<GrossDict> list = grossDictService.list(wrapper);
+        return R.data(GrossDictWrapper.build().listVO(list));
     }
 }

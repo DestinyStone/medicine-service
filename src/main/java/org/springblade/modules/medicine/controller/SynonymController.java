@@ -11,21 +11,15 @@ import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.core.tool.utils.StringUtil;
-import org.springblade.modules.medicine.dto.MedicineDTO;
 import org.springblade.modules.medicine.dto.SynonymDTO;
 import org.springblade.modules.medicine.entity.GrossDict;
-import org.springblade.modules.medicine.entity.Medicine;
 import org.springblade.modules.medicine.entity.Synonym;
 import org.springblade.modules.medicine.entity.SynonymItem;
 import org.springblade.modules.medicine.service.GrossDictService;
 import org.springblade.modules.medicine.service.SynonymItemService;
 import org.springblade.modules.medicine.service.SynonymService;
-import org.springblade.modules.medicine.vo.MedicineVO;
 import org.springblade.modules.medicine.vo.SynonymVO;
 import org.springblade.modules.medicine.wrapper.GrossDictWrapper;
-import org.springblade.modules.medicine.wrapper.GrossWrapper;
-import org.springblade.modules.medicine.wrapper.MedicineWrapper;
 import org.springblade.modules.medicine.wrapper.SynonymWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +84,7 @@ public class SynonymController {
     /**
      * 更新
      */
-    @PostMapping("/update/{id}")
+        @PostMapping("/update/{id}")
     @Transactional
     public R update(@PathVariable("id") Long id, @RequestBody @Valid SynonymDTO dto) {
         Synonym convert = BeanUtil.copy(dto, Synonym.class);
@@ -105,7 +99,7 @@ public class SynonymController {
         if (CollUtil.isNotEmpty(dto.getDictIds())) {
             List<SynonymItem> collect = dto.getDictIds().stream().map(item -> {
                 SynonymItem synonymItem = new SynonymItem();
-                synonymItem.setSynonymId(convert.getId());
+                synonymItem.setSynonymId(id);
                 synonymItem.setDictId(item);
                 return synonymItem;
             }).collect(Collectors.toList());
@@ -146,7 +140,9 @@ public class SynonymController {
 
         Map<Long, List<SynonymItem>> group = list.stream().collect(Collectors.groupingBy(SynonymItem::getSynonymId));
 
-
+        if(CollUtil.isEmpty(list)) {
+            return R.data(pageVO);
+        }
         Map<Long, GrossDict> collect = grossDictService.listByIds(list.stream().map(SynonymItem::getDictId)
                 .collect(Collectors.toList()))
                 .stream().collect(Collectors.toMap(GrossDict::getId, Function.identity()));

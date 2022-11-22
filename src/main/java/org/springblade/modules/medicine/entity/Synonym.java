@@ -34,4 +34,7 @@ public class Synonym {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "描述")
+    private String remark;
 }

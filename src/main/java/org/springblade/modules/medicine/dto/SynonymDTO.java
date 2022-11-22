@@ -13,5 +13,7 @@ import java.util.List;
 public class SynonymDTO {
     private String name;
 
+    private String remark;
+
     private List<Long> dictIds;
 }
