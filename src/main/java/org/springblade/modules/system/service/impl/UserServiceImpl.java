@@ -77,6 +77,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public boolean submit(User user) {
+		user.setDeptId("1487785597304172546");
 		if (StringUtil.isBlank(user.getTenantId())) {
 			user.setTenantId(BladeConstant.ADMIN_TENANT_ID);
 		}

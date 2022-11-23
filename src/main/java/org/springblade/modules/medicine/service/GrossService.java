@@ -17,4 +17,6 @@ public interface GrossService extends IService<Gross> {
     void handler(List<Medicine> convert);
 
     void removeByBelongIds(List<Long> toLongList);
+
+    List<String> listByNames(List<String> names, Integer type);
 }

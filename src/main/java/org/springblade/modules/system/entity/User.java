@@ -95,6 +95,6 @@ public class User extends TenantEntity {
 	/**
 	 * 积分
 	 */
-	private String score;
+	private Long score;
 
 }

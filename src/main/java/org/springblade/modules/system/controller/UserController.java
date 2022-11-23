@@ -17,6 +17,7 @@
 package org.springblade.modules.system.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -29,6 +30,7 @@ import org.springblade.common.cache.SysCache;
 import org.springblade.core.cache.utils.CacheUtil;
 import org.springblade.core.excel.util.ExcelUtil;
 import org.springblade.core.launch.constant.AppConstant;
+import org.springblade.core.log.exception.ServiceException;
 import org.springblade.core.mp.support.Condition;
 import org.springblade.core.mp.support.Query;
 import org.springblade.core.secure.BladeUser;
@@ -54,6 +56,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.xml.ws.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -150,6 +153,7 @@ public class UserController {
 	@ApiOperation(value = "修改", notes = "传入User")
 	public R update(@Valid @RequestBody User user) {
 		CacheUtil.clear(USER_CACHE);
+		user.setDeptId("1487785597304172546");
 		return R.status(userService.updateUser(user));
 	}
 
@@ -325,6 +329,20 @@ public class UserController {
 	@GetMapping("/search/user")
 	public R<IPage<UserVO>> userSearch(@ApiIgnore UserVO user, @ApiIgnore Query query) {
 		return R.data(userService.selectUserSearch(user, query));
+	}
+
+	/**
+	 * 扣除用户积分
+	 */
+	@GetMapping("/score/decr")
+	public synchronized R<Long> scoreDecr() {
+		User user = userService.getById(AuthUtil.getUserId());
+		if (user.getScore() == null || user.getScore() == 0) {
+			throw new ServiceException("当前用户积分为0, 不可操作, 请联系管理员");
+		}
+		user.setScore(user.getScore() - 1);
+		userService.updateById(user);
+		return R.data(user.getScore());
 	}
 
 }

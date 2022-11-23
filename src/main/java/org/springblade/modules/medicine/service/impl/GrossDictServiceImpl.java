@@ -57,4 +57,11 @@ public class GrossDictServiceImpl extends ServiceImpl<GrossDictMapper, GrossDict
             }).collect(Collectors.toList()));
         }
     }
+
+    @Override
+    public List<GrossDict> listByNames(List<String> names) {
+        LambdaQueryWrapper<GrossDict> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(GrossDict::getName, names);
+        return list(wrapper);
+    }
 }

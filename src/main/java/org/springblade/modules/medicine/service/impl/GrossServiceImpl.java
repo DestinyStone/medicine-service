@@ -54,6 +54,11 @@ public class GrossServiceImpl extends ServiceImpl<GrossMapper, Gross> implements
         grossDictService.rebuild();
     }
 
+    @Override
+    public List<String> listByNames(List<String> names, Integer type) {
+        return baseMapper.listByNames(names, type);
+    }
+
     private List<Gross> convert(Medicine medicine) {
         String[] split = medicine.getPutUp().split("，");
         return Arrays.stream(split).map(item -> {
