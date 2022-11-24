@@ -21,6 +21,7 @@ import org.springblade.modules.medicine.entity.Medicine;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springblade.modules.medicine.service.MedicineService;
 import org.springblade.modules.medicine.service.SynonymService;
+import org.springblade.modules.medicine.vo.MedicineComponentVO;
 import org.springblade.modules.medicine.vo.MedicineScoreVO;
 import org.springblade.modules.medicine.vo.MedicineVO;
 import org.springblade.modules.medicine.wrapper.MedicineWrapper;
@@ -146,6 +147,11 @@ public class MedicineController {
     @PostMapping("/list/gross/{type}")
     @Transactional
     public R<List<MedicineScoreVO>> listGross(@RequestBody List<String> names, @PathVariable("type") Integer type) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (CollUtil.isEmpty(names)) {
             return R.data(new ArrayList<>());
         }
@@ -183,5 +189,36 @@ public class MedicineController {
 
         return R.data(resultVO);
     }
+
+    /**
+     * 组方
+     */
+    @PostMapping("/component")
+    public R<MedicineComponentVO> component(@RequestBody List<Long> ids) {
+        MedicineComponentVO vo = new MedicineComponentVO();
+        if (ids.size() == 1) {
+            Medicine medicine = medicineService.getById(ids.get(0));
+            vo.setComponent(medicine.getSolve());
+            return R.data(vo);
+        }
+
+        if (ids.size() == 2) {
+            Medicine medicine1 = medicineService.getById(ids.get(0));
+            Medicine medicine2 = medicineService.getById(ids.get(1));
+            // 获取交集
+            List<String> solve1 = Arrays.stream(medicine1.getSolve().split("，")).collect(Collectors.toList());
+            List<String> solve2 = Arrays.stream(medicine2.getSolve().split("，")).collect(Collectors.toList());
+            List<String> intersection = solve1.stream().filter(item -> solve2.contains(item)).collect(Collectors.toList());
+
+            if (intersection.size() / new Double(solve1.size()) >= 0.5 && intersection.size() / new Double(solve2.size()) >= 0.5) {
+                vo.setComponent(CollUtil.join(intersection, "，"));
+                return R.data(vo);
+            }
+            vo.setComponent(medicine1.getSolve());
+            vo.setDialectical(medicine1.getName());
+        }
+        return R.data(vo);
+    }
+
 
 }
