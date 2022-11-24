@@ -49,9 +49,9 @@ spring:
         session-stat-max-count: 10
   redis:
     ##redis 单机环境配置
-    host: localhost
+    host: 192.168.1.205
     port: 6379
-    password:
+    password: 123456
     database: 7
     ssl: false
 

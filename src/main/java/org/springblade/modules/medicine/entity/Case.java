@@ -66,4 +66,7 @@ public class Case {
 
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "0 开诊 1复诊")
+    private Integer type;
 }

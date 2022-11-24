@@ -64,6 +64,7 @@ public class MedicineController {
         ArrayList<Medicine> medicines = new ArrayList<>();
         for (WordUtil.Template template : templates) {
             Medicine convert = BeanUtil.copy(template, Medicine.class);
+            convert = handler(convert);
             convert.setCreateUser(AuthUtil.getUserId());
             convert.setCreateTime(new Date());
             convert.setCreateDept(Func.firstLong(AuthUtil.getDeptId()));
@@ -84,7 +85,11 @@ public class MedicineController {
     public R<IPage<MedicineVO>> page(MedicineVO vo, Query query) {
         LambdaQueryWrapper<Medicine> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(vo.getType() != null, Medicine::getType, vo.getType());
-        wrapper.like(StringUtil.isNotBlank(vo.getName()), Medicine::getName, vo.getName());
+        wrapper.and(StringUtil.isNotBlank(vo.getName()), item -> {
+            item.like(Medicine::getName, vo.getName())
+                    .or()
+                    .like(Medicine::getPutUp, vo.getName());
+        });
         IPage<Medicine> page = medicineService.page(Condition.getPage(query), wrapper);
         return R.data(MedicineWrapper.build().pageVO(page));
     }
@@ -115,6 +120,7 @@ public class MedicineController {
     @Transactional
     public R save(@RequestBody @Valid MedicineDTO medicineDTO) {
         Medicine convert = BeanUtil.copy(medicineDTO, Medicine.class);
+        convert = handler(convert);
         convert.setCreateUser(AuthUtil.getUserId());
         convert.setCreateTime(new Date());
         convert.setCreateDept(Func.firstLong(AuthUtil.getDeptId()));
@@ -133,6 +139,7 @@ public class MedicineController {
     @Transactional
     public R update(@PathVariable("id") Long id, @RequestBody @Valid MedicineDTO medicineDTO) {
         Medicine convert = BeanUtil.copy(medicineDTO, Medicine.class);
+        convert = handler(convert);
         convert.setId(id);
         convert.setUpdateUser(AuthUtil.getUserId());
         convert.setUpdateTime(new Date());
@@ -221,4 +228,9 @@ public class MedicineController {
     }
 
 
+    private Medicine handler(Medicine medicine) {
+        medicine.setPutUp(medicine.getPutUp().replaceAll("\n", "").replaceAll(",", "，"));
+        medicine.setSolve(medicine.getSolve().replaceAll("\n", "").replaceAll(",", "，"));
+        return medicine;
+    }
 }

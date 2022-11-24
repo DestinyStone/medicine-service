@@ -60,6 +60,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>e-iceblue</groupId>
+            <artifactId>spire.office</artifactId>
+            <version>5.4.2</version>
+        </dependency>
+        <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>5.7.12</version>

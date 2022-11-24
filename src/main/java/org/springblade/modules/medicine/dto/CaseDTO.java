@@ -15,6 +15,9 @@ import java.util.List;
  */
 @Data
 public class CaseDTO {
+
+    private Integer type;
+
     @ApiModelProperty(value = "病例编号")
     private String code;
 

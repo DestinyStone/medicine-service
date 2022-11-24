@@ -12,8 +12,10 @@ import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.medicine.dto.AnalyzeDTO;
 import org.springblade.modules.medicine.entity.Analyze;
+import org.springblade.modules.medicine.entity.Synonym;
 import org.springblade.modules.medicine.service.AnalyzeService;
 import org.springblade.modules.medicine.vo.AnalyzeDetailVO;
 import org.springblade.modules.medicine.vo.AnalyzeVO;
@@ -89,6 +91,7 @@ public class AnalyzeController {
     @GetMapping("/page")
     public R<IPage<AnalyzeVO>> page(Analyze vo, Query query) {
         LambdaQueryWrapper<Analyze> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtil.isNotBlank(vo.getName()), Analyze::getName, vo.getName());
         IPage<Analyze> page = analyzeService.page(Condition.getPage(query), wrapper);
         return R.data(AnalyzeWrapper.build().pageVO(page));
     }

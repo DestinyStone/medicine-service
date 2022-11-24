@@ -11,6 +11,7 @@ import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
+import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.medicine.dto.SynonymDTO;
 import org.springblade.modules.medicine.entity.GrossDict;
 import org.springblade.modules.medicine.entity.Synonym;
@@ -128,6 +129,7 @@ public class SynonymController {
     @GetMapping("/page")
     public R<IPage<SynonymVO>> page(SynonymVO vo, Query query) {
         LambdaQueryWrapper<Synonym> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtil.isNotBlank(vo.getName()), Synonym::getName, vo.getName());
         IPage<Synonym> page = synonymService.page(Condition.getPage(query), wrapper);
         if (CollUtil.isEmpty(page.getRecords())) {
             return R.data(SynonymWrapper.build().pageVO(page));
