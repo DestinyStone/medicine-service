@@ -98,7 +98,7 @@ public class CaseDownLoadUtils {
     private static PdfDocument convertPdf(PdfDocument pdfDocument) {
         PdfDocument newPdf = new PdfDocument();
         for (int i = 0; i < pdfDocument.getPages().getCount(); i++) {
-            PdfPageBase newPage = newPdf.getPages().add(PdfPageSize.A4, new PdfMargins(-20, -20, -20, -20));
+            PdfPageBase newPage = newPdf.getPages().add(PdfPageSize.A4, new PdfMargins(10, 10, 10, 10));
 
             //将原PDF内容写入新页面
             pdfDocument.getPages().get(i).createTemplate().draw(newPage, new Point(0, 0));

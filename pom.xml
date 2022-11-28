@@ -60,9 +60,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>e-iceblue</groupId>
+            <groupId>com.spire</groupId>
             <artifactId>spire.office</artifactId>
-            <version>5.4.2</version>
+            <version>3.0</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
