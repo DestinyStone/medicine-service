@@ -15,8 +15,8 @@ import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.medicine.dto.AnalyzeDTO;
 import org.springblade.modules.medicine.entity.Analyze;
-import org.springblade.modules.medicine.entity.Synonym;
 import org.springblade.modules.medicine.service.AnalyzeService;
+import org.springblade.modules.medicine.util.AnalyzeUtil;
 import org.springblade.modules.medicine.vo.AnalyzeDetailVO;
 import org.springblade.modules.medicine.vo.AnalyzeVO;
 import org.springblade.modules.medicine.wrapper.AnalyzeWrapper;
@@ -112,7 +112,7 @@ public class AnalyzeController {
     public R<List<AnalyzeDetailVO>> detail(@RequestParam("names") String names) {
         List<AnalyzeDetailVO> vo = new ArrayList<>();;
         List<String> nameList = Arrays.stream(names.split("，")).collect(Collectors.toList());
-        nameList = handlerNames(nameList);
+        nameList = AnalyzeUtil.handlerNames(nameList);
 
         if (CollUtil.isEmpty(nameList)) {
             throw new ServiceException("处方分析异常， 处方:" + names);
@@ -137,27 +137,5 @@ public class AnalyzeController {
             }
         }
         return R.data(vo);
-    }
-
-    private List<String> handlerNames(List<String> names) {
-        return names.stream().map(item -> {
-            return handlerName(item);
-        }).filter(item -> {
-            return item != null && !Objects.equals("", item);
-        }).collect(Collectors.toList());
-    }
-
-    private String handlerName(String name) {
-        name = name.replaceAll("\n", "");
-        int substringIndex = 0;
-        for (int i = 0; i < name.length(); i++) {
-            try {
-                new Integer(name.charAt(i) + "");
-                break;
-            }catch (Exception e) {
-                substringIndex = i;
-            }
-        }
-        return name.substring(0, substringIndex + 1);
     }
 }

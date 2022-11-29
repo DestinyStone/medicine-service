@@ -2,7 +2,6 @@ package org.springblade.modules.medicine.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springblade.modules.medicine.entity.Gross;
 import org.springblade.modules.medicine.entity.GrossDict;
@@ -11,7 +10,6 @@ import org.springblade.modules.medicine.service.GrossDictService;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.text.CollatorUtilities;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +43,7 @@ public class GrossDictServiceImpl extends ServiceImpl<GrossDictMapper, GrossDict
         }else {
             LambdaQueryWrapper<GrossDict> deleteWrapper = new LambdaQueryWrapper<>();
             deleteWrapper.notIn(GrossDict::getId, existList.stream().map(GrossDict::getId).collect(Collectors.toList()));
+            remove(deleteWrapper);
         }
         // 填充额外的数据
         List<String> collect = list.stream().map(GrossDict::getName).collect(Collectors.toList());

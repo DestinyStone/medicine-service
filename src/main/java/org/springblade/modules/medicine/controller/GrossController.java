@@ -10,9 +10,7 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.StringUtil;
-import org.springblade.modules.medicine.entity.Gross;
 import org.springblade.modules.medicine.entity.GrossDict;
-import org.springblade.modules.medicine.entity.Synonym;
 import org.springblade.modules.medicine.service.GrossDictService;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springblade.modules.medicine.service.SynonymService;
@@ -24,9 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @Author: zhouxiaofeng
@@ -83,8 +82,16 @@ public class GrossController {
         if (CollUtil.isEmpty(names)) {
             return R.data(new ArrayList<>());
         }
-        List<GrossDict> list = grossDictService.listByNames(names);
-        return R.data(convert(list, 0));
+        Map<String, GrossDict> collect = grossDictService.listByNames(names).stream().collect(Collectors.toMap(GrossDict::getName, Function.identity()));
+        ArrayList<GrossDict> result = new ArrayList<>();
+        for (String name : names) {
+            GrossDict grossDict = collect.get(name);
+            if (result != null) {
+                result.add(grossDict);
+            }
+        }
+
+        return R.data(convert(result, 0));
     }
 
     /**

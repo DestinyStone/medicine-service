@@ -21,6 +21,7 @@ import org.springblade.modules.medicine.entity.Medicine;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springblade.modules.medicine.service.MedicineService;
 import org.springblade.modules.medicine.service.SynonymService;
+import org.springblade.modules.medicine.util.AnalyzeUtil;
 import org.springblade.modules.medicine.vo.MedicineComponentVO;
 import org.springblade.modules.medicine.vo.MedicineScoreVO;
 import org.springblade.modules.medicine.vo.MedicineVO;
@@ -32,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -155,7 +157,7 @@ public class MedicineController {
     @Transactional
     public R<List<MedicineScoreVO>> listGross(@RequestBody List<String> names, @PathVariable("type") Integer type) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -170,8 +172,9 @@ public class MedicineController {
         }
 
         // 找到所有包含的症状id
+        Set<String> dictNames = dicts.stream().map(GrossDict::getName).collect(Collectors.toSet());
         LambdaQueryWrapper<Gross> grossWrapper = new LambdaQueryWrapper<>();
-        grossWrapper.in(Gross::getName, dicts.stream().map(GrossDict::getName).collect(Collectors.toSet()))
+        grossWrapper.in(Gross::getName, dictNames)
                 .eq(Gross::getBelongType, type);
         List<Gross> grossList = grossService.list(grossWrapper);
 
@@ -183,7 +186,7 @@ public class MedicineController {
         List<MedicineScoreVO> resultVO = list.stream().map(item -> {
             MedicineScoreVO result = BeanUtil.copy(item, MedicineScoreVO.class);
             String[] putUps = item.getPutUp().split("，");
-            Set<String> existNames = Arrays.stream(putUps).filter(filterItem -> names.contains(filterItem)).collect(Collectors.toSet());
+            Set<String> existNames = Arrays.stream(putUps).filter(filterItem -> dictNames.contains(filterItem)).collect(Collectors.toSet());
             result.setScore(existNames.size() / new Double(putUps.length));
             return result;
         }).collect(Collectors.toList());
@@ -213,12 +216,22 @@ public class MedicineController {
             Medicine medicine1 = medicineService.getById(ids.get(0));
             Medicine medicine2 = medicineService.getById(ids.get(1));
             // 获取交集
-            List<String> solve1 = Arrays.stream(medicine1.getSolve().split("，")).collect(Collectors.toList());
-            List<String> solve2 = Arrays.stream(medicine2.getSolve().split("，")).collect(Collectors.toList());
+            List<String> solve1 = Arrays.stream(medicine1.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
+            List<String> solve2 = Arrays.stream(medicine2.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
             List<String> intersection = solve1.stream().filter(item -> solve2.contains(item)).collect(Collectors.toList());
 
             if (intersection.size() / new Double(solve1.size()) >= 0.5 && intersection.size() / new Double(solve2.size()) >= 0.5) {
-                vo.setComponent(CollUtil.join(intersection, "，"));
+                Map<String, String> solve1Map = Arrays.stream(medicine1.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
+                Map<String, String> solve2Map = Arrays.stream(medicine2.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
+                ArrayList<String> result = new ArrayList<>();
+                for (String item : intersection) {
+                    String solve1Item = solve1Map.get(item);
+                    String solve2Item = solve2Map.get(item);
+                    long number = AnalyzeUtil.aroundNumber(solve1Item, solve2Item);
+                    result.add(item + number);
+                }
+
+                vo.setComponent(CollUtil.join(result, "，"));
                 return R.data(vo);
             }
             vo.setComponent(medicine1.getSolve());
