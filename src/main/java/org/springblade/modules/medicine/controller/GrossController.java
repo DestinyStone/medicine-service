@@ -3,6 +3,7 @@ package org.springblade.modules.medicine.controller;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.ApiConstant;
 import org.springblade.core.mp.support.Condition;
@@ -92,6 +93,19 @@ public class GrossController {
         }
 
         return R.data(convert(result, 0));
+    }
+
+    /**
+     * 获取同义
+     */
+    @GetMapping("/resemblance")
+    public R<List<GrossDictSynonymsVO>> resemblance(String ids) {
+        if (StrUtil.isBlank(ids)) {
+            return R.data(new ArrayList<>());
+        }
+        List<GrossDict> synonymDict = synonymService.getSynonymDict(Func.toLongList(ids)).stream().collect(Collectors.toSet())
+                .stream().collect(Collectors.toList());
+        return R.data(convert(synonymDict, 1));
     }
 
     /**

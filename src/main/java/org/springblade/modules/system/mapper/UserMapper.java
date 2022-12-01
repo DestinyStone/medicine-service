@@ -61,4 +61,5 @@ public interface UserMapper extends BaseMapper<User> {
 	 */
 	List<UserExcel> exportUser(@Param("ew") Wrapper<User> queryWrapper);
 
+    void deleteAll();
 }

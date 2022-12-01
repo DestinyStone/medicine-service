@@ -4,35 +4,28 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
 /**
- * @Author: zhouxiaofeng
- * @Date: 2022/11/18 13:54
+ * @Author: DestinyStone
+ * @Date: 2022/12/2 00:22
  * @Description:
  */
 @Data
-@TableName("bus_medicine")
-public class Medicine {
-    @Id
+@TableName("bus_reback")
+public class Reback {
+    @ApiModelProperty(value = "id")
     private Long id;
+
+    @ApiModelProperty(value = "路径")
+    private String path;
 
     @ApiModelProperty(value = "名称")
     private String name;
 
-    @ApiModelProperty(value = "症状")
-    private String putUp;
-
-    @ApiModelProperty(value = "药方")
-    private String solve;
-
-    @ApiModelProperty(value = "描述")
-    private String remark;
-
-    @ApiModelProperty(value = "0 古医数据集 1 名医数据集")
-    private Integer type;
+    @ApiModelProperty(value = "状态 0 当前分支 1 其他分支")
+    private Integer status;
 
     @ApiModelProperty(value = "创建用户")
     private Long createUser;
@@ -51,7 +44,9 @@ public class Medicine {
     @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
-    public void setPutUp(String putUp) {
-        this.putUp = putUp.replace(",", "，");
-    }
+    @ApiModelProperty(value = "备份编号")
+    private String code;
+
+    @ApiModelProperty(value = "remark")
+    private String remark;
 }

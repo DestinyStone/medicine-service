@@ -1,5 +1,6 @@
 package org.springblade.modules.medicine.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -36,5 +37,6 @@ public class BusCode {
 	private String flag;
 
 	@ApiModelProperty("更新日期")
+	@JSONField(format="yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
 }

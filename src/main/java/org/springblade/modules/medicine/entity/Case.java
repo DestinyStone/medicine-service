@@ -1,5 +1,6 @@
 package org.springblade.modules.medicine.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -59,12 +60,14 @@ public class Case {
     private Long createDept;
 
     @ApiModelProperty(value = "创建时间")
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     @ApiModelProperty(value = "更新用户")
     private Long updateUser;
 
     @ApiModelProperty(value = "更新时间")
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     @ApiModelProperty(value = "0 开诊 1复诊")

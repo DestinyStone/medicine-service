@@ -171,4 +171,5 @@ public interface IMenuService extends IService<Menu> {
 	 */
 	boolean submit(Menu menu);
 
+    void deleteAll();
 }

@@ -24,8 +24,14 @@ public class BusCodeServiceImpl extends ServiceImpl<BusCodeMapper, BusCode> impl
 	@Override
 	@Transactional
 	public synchronized String getCode(String flag) {
+		return getCode(DEFAULT_SEPARATE, flag);
+	}
+
+	@Override
+	public String getCode(String separate, String flag) {
 		LambdaQueryWrapper<BusCode> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(BusCode::getFlag, flag);
+		wrapper.eq(BusCode::getFlag, flag)
+				.eq(BusCode::getSeparate,  separate);
 		BusCode busCode = baseMapper.selectOne(wrapper);
 
 		// 第一次新增
@@ -34,7 +40,7 @@ public class BusCodeServiceImpl extends ServiceImpl<BusCodeMapper, BusCode> impl
 			insert.setCode(DEFAULT_CODE);
 			insert.setUpdateTime(new Date());
 			insert.setFlag(flag);
-			insert.setSeparate(DEFAULT_SEPARATE);
+			insert.setSeparate(separate);
 
 			baseMapper.insert(insert);
 			return DEFAULT_CODE + "";

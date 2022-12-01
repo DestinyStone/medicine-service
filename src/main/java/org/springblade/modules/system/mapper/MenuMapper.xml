@@ -492,5 +492,8 @@
             AND m.path IS NOT NULL and m.is_deleted = 0
         GROUP BY m.path
     </select>
+    <delete id="deleteAll">
+        delete from blade_menu
+    </delete>
 
 </mapper>

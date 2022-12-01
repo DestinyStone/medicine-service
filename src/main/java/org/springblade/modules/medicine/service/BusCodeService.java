@@ -17,6 +17,8 @@ public interface BusCodeService extends IService<BusCode> {
 	 */
 	String getCode(String flag);
 
+	String getCode(String separate, String flag);
+
 	/**
 	 * 刷新编码
 	 * @param flag

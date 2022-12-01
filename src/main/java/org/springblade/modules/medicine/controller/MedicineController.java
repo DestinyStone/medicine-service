@@ -18,10 +18,12 @@ import org.springblade.modules.medicine.dto.MedicineDTO;
 import org.springblade.modules.medicine.entity.Gross;
 import org.springblade.modules.medicine.entity.GrossDict;
 import org.springblade.modules.medicine.entity.Medicine;
+import org.springblade.modules.medicine.service.GrossDictService;
 import org.springblade.modules.medicine.service.GrossService;
 import org.springblade.modules.medicine.service.MedicineService;
 import org.springblade.modules.medicine.service.SynonymService;
 import org.springblade.modules.medicine.util.AnalyzeUtil;
+import org.springblade.modules.medicine.vo.ComponentVO;
 import org.springblade.modules.medicine.vo.MedicineComponentVO;
 import org.springblade.modules.medicine.vo.MedicineScoreVO;
 import org.springblade.modules.medicine.vo.MedicineVO;
@@ -33,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +55,9 @@ public class MedicineController {
 
     @Autowired
     private SynonymService synonymService;
+
+    @Autowired
+    private GrossDictService dictService;
 
     /**
      * 上传文件
@@ -204,40 +208,117 @@ public class MedicineController {
      * 组方
      */
     @PostMapping("/component")
-    public R<MedicineComponentVO> component(@RequestBody List<Long> ids) {
+    public R<MedicineComponentVO> component(@RequestBody ComponentVO componentVO) {
         MedicineComponentVO vo = new MedicineComponentVO();
-        if (ids.size() == 1) {
-            Medicine medicine = medicineService.getById(ids.get(0));
+        if (componentVO.getIds().size() == 1) {
+            Medicine medicine = medicineService.getById(componentVO.getIds().get(0));
             vo.setComponent(medicine.getSolve());
             return R.data(vo);
         }
 
-        if (ids.size() == 2) {
-            Medicine medicine1 = medicineService.getById(ids.get(0));
-            Medicine medicine2 = medicineService.getById(ids.get(1));
-            // 获取交集
-            List<String> solve1 = Arrays.stream(medicine1.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
-            List<String> solve2 = Arrays.stream(medicine2.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
-            List<String> intersection = solve1.stream().filter(item -> solve2.contains(item)).collect(Collectors.toList());
+        // 超过50%的集合
+        List<Medicine> result = new ArrayList<>();
 
-            if (intersection.size() / new Double(solve1.size()) >= 0.5 && intersection.size() / new Double(solve2.size()) >= 0.5) {
-                Map<String, String> solve1Map = Arrays.stream(medicine1.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
-                Map<String, String> solve2Map = Arrays.stream(medicine2.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
-                ArrayList<String> result = new ArrayList<>();
-                for (String item : intersection) {
-                    String solve1Item = solve1Map.get(item);
-                    String solve2Item = solve2Map.get(item);
-                    long number = AnalyzeUtil.aroundNumber(solve1Item, solve2Item);
-                    result.add(item + number);
+        // 病人症状
+        List<String> dictNames = dictService.listByIds(componentVO.getDictIds()).stream().map(GrossDict::getName).collect(Collectors.toList());
+
+        for (Long id : componentVO.getIds()) {
+            Medicine medicine = medicineService.getById(id);
+            List<String> putUps = Arrays.stream(medicine.getPutUp().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
+
+            // 取交集
+            List<String> intersection = dictNames.stream().filter(item -> putUps.contains(item)).collect(Collectors.toList());
+
+            if (intersection.size() / new Double(putUps.size()) >= 0.5) {
+                result.add(medicine);
+            }
+        }
+
+        if (result.size() == 0) {
+            Medicine medicine = medicineService.getById(componentVO.getIds().get(0));
+            vo.setComponent(medicine.getSolve());
+            vo.setDialectical(medicine.getName());
+            return R.data(vo);
+        }
+
+        if (result.size() == 1) {
+            Medicine medicine = result.get(0);
+            vo.setComponent(medicine.getSolve());
+            vo.setDialectical(medicine.getName());
+            return R.data(vo);
+        }
+        // 药材和总量
+        HashMap<String, Long> countMap = new HashMap<>();
+        // 药材和出现的次数
+        HashMap<String, Long> numberMap = new HashMap<>();
+        for (Long id : componentVO.getIds()) {
+            Medicine medicine = medicineService.getById(id);
+            List<String> solve = Arrays.stream(medicine.getSolve().split("，")).collect(Collectors.toList());
+            for (String solveItem : solve) {
+                String solveName = AnalyzeUtil.handlerName(solveItem);
+                long number = AnalyzeUtil.handlerNumber(solveItem);
+                Long currentCount = countMap.get(solveName);
+                if (currentCount == null) {
+                    countMap.put(solveName, new Long(number));
+                }else {
+                    countMap.replace(solveName, currentCount + number);
                 }
 
-                vo.setComponent(CollUtil.join(result, "，"));
-                return R.data(vo);
+                Long currentNumber = numberMap.get(solveName);
+                if (currentNumber == null) {
+                    numberMap.put(solveName, 1L);
+                }else {
+                    numberMap.replace(solveName, currentNumber + 1);
+                }
+
             }
-            vo.setComponent(medicine1.getSolve());
-            vo.setDialectical(medicine1.getName());
         }
+        ArrayList<String> resultName = new ArrayList<>();
+        countMap.forEach((key, value) -> {
+            Long number = numberMap.get(key);
+            long count = Math.round(value / new Double(number));
+            resultName.add(key + count);
+        });
+        vo.setComponent(CollUtil.join(resultName, "，"));
         return R.data(vo);
+        
+
+//        if (ids.size() == 2) {
+//            Medicine medicine1 = medicineService.getById(ids.get(0));
+//            Medicine medicine2 = medicineService.getById(ids.get(1));
+//            // 获取交集
+//            List<String> solve1 = Arrays.stream(medicine1.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
+//            List<String> solve2 = Arrays.stream(medicine2.getSolve().split("，")).map(AnalyzeUtil::handlerName).collect(Collectors.toList());
+//            List<String> intersection = solve1.stream().filter(item -> solve2.contains(item)).collect(Collectors.toList());
+//
+//            if (intersection.size() / new Double(solve1.size()) >= 0.5 && intersection.size() / new Double(solve2.size()) >= 0.5) {
+//                Map<String, String> solve1Map = Arrays.stream(medicine1.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
+//                Map<String, String> solve2Map = Arrays.stream(medicine2.getSolve().split("，")).collect(Collectors.toMap(AnalyzeUtil::handlerName, Function.identity()));
+//                ArrayList<String> result = new ArrayList<>();
+//                for (String item : intersection) {
+//                    String solve1Item = solve1Map.get(item);
+//                    String solve2Item = solve2Map.get(item);
+//                    long number = AnalyzeUtil.aroundNumber(solve1Item, solve2Item);
+//                    result.add(item + number);
+//                }
+//
+//                vo.setComponent(CollUtil.join(result, "，"));
+//                return R.data(vo);
+//            }
+//            vo.setComponent(medicine1.getSolve());
+//            vo.setDialectical(medicine1.getName());
+//        }
+//
+//        if (ids.size() == 3) {
+//            Medicine medicine1 = medicineService.getById(ids.get(0));
+//            Medicine medicine2 = medicineService.getById(ids.get(1));
+//            Medicine medicine3 = medicineService.getById(ids.get(3));
+//
+//            // 超过50的集合
+//
+//
+//        }
+//        return R.data(vo);
     }
 
 

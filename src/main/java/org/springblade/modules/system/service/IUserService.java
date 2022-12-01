@@ -206,4 +206,6 @@ public interface IUserService extends BaseService<User> {
 	 * @return
 	 */
 	UserVO platformDetail(User user);
+
+    void deleteAll();
 }

@@ -245,4 +245,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
 		return saveOrUpdate(menu);
 	}
 
+	@Override
+	public void deleteAll() {
+		baseMapper.deleteAll();
+	}
+
 }

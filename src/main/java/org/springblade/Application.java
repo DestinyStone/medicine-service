@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -40,6 +41,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 )
 @MapperScan(value = {"org.springblade.**.mapper"})
+@Import(cn.hutool.extra.spring.SpringUtil.class)
 public class Application {
 
 	public static void main(String[] args) {

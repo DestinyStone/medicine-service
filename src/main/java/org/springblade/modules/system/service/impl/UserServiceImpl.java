@@ -427,4 +427,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 		return userVO;
 	}
 
+	@Override
+	public void deleteAll() {
+		baseMapper.deleteAll();
+	}
+
 }
