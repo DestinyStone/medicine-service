@@ -12,4 +12,6 @@ public interface RebackService extends IService<Reback> {
     boolean saveReback();
 
     boolean reback(Long id);
+
+    boolean deleteSync(String ids);
 }

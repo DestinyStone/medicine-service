@@ -76,4 +76,13 @@ public class RebackController {
         IPage<Reback> page = rebackService.page(Condition.getPage(query), wrapper);
         return R.data(RebackWrapper.build().pageVO(page));
     }
+
+    /**
+     * 删除
+     */
+    @GetMapping("/delete")
+    public R delete(@RequestParam("ids") String ids) {
+        return R.status(rebackService.deleteSync(ids));
+    }
+
 }

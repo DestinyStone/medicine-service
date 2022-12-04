@@ -3,7 +3,6 @@ package org.springblade.modules.medicine.controller;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import org.springblade.common.constant.ApiConstant;
@@ -13,7 +12,6 @@ import org.springblade.core.secure.utils.AuthUtil;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.BeanUtil;
 import org.springblade.core.tool.utils.Func;
-import org.springblade.core.tool.utils.StringUtil;
 import org.springblade.modules.medicine.dto.CaseDTO;
 import org.springblade.modules.medicine.entity.Case;
 import org.springblade.modules.medicine.entity.GrossDict;
@@ -102,6 +100,7 @@ public class CaseController {
             .in(CollUtil.isNotEmpty(userIds), Case::getCreateUser, userIds)
             .like(StrUtil.isNotBlank(vo.getName()), Case::getName, vo.getName());
 
+        wrapper.orderByDesc(Case::getCreateTime);
         IPage<Case> page = caseService.page(Condition.getPage(query), wrapper);
         return R.data(CaseWrapper.build().pageVO(page));
     }

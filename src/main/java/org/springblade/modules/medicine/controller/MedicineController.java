@@ -229,7 +229,7 @@ public class MedicineController {
             // 取交集
             List<String> intersection = dictNames.stream().filter(item -> putUps.contains(item)).collect(Collectors.toList());
 
-            if (intersection.size() / new Double(putUps.size()) >= 0.5) {
+            if (intersection.size() / new Double(putUps.size()) > 0.5) {
                 result.add(medicine);
             }
         }

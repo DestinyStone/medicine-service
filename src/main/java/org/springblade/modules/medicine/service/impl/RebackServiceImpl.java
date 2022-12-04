@@ -38,7 +38,8 @@ import java.util.List;
  * @Description:
  */
 @Service
-public class RebackServiceImpl extends ServiceImpl<RebackMapper, Reback> implements RebackService {
+public class
+RebackServiceImpl extends ServiceImpl<RebackMapper, Reback> implements RebackService {
 
 
     private static final List<RebackDTO> rebackList = new ArrayList<>();
@@ -83,6 +84,7 @@ public class RebackServiceImpl extends ServiceImpl<RebackMapper, Reback> impleme
     private static final SimpleDateFormat YYYY_DIR_FORMAT = new SimpleDateFormat("yyyy");
     private static final SimpleDateFormat MM_DIR_FORMAT = new SimpleDateFormat("MM");
     private static final SimpleDateFormat DD_DIR_FORMAT = new SimpleDateFormat("dd");
+    private static final SimpleDateFormat HH_DIR_FORMAT = new SimpleDateFormat("HH");
     private final SimpleDateFormat FORAMT = new SimpleDateFormat("yyyyMMddHH");
     @Override
     @Transactional
@@ -148,12 +150,46 @@ public class RebackServiceImpl extends ServiceImpl<RebackMapper, Reback> impleme
         return true;
     }
 
+    @Override
+    public boolean deleteSync(String ids) {
+        List<Long> idList = Func.toLongList(ids);
+        List<Reback> rebacks = listByIds(idList);
+        removeByIds(idList);
+        for (Reback item : rebacks) {
+            removeFile(item);
+        }
+        return true;
+    }
+
+    private void removeFile(Reback reback) {
+       try {
+           if (reback == null) {
+               return;
+           }
+           File file = new File(reback.getPath());
+           if (!file.exists()) {
+               return;
+           }
+           for (RebackDTO rebackDTO : rebackList) {
+               File currentFile = new File(reback.getPath() + File.separator + rebackDTO.getFileName());
+               if (file.exists()) {
+                   currentFile.delete();
+               }
+           }
+           file.delete();
+       }catch (Exception e) {
+           e.printStackTrace();
+       }
+
+    }
+
     private String getBasicPath(Date date, String code) {
         String yy = YYYY_DIR_FORMAT.format(date);
         String mm = MM_DIR_FORMAT.format(date);
         String dd = DD_DIR_FORMAT.format(date);
+        String hh = HH_DIR_FORMAT.format(date);
         String other = code;
-        return FileUtil.getFilePath(BASIC_SAVE_DIR + File.separator + yy + File.separator + mm + File.separator + dd + File.separator + other);
+        return FileUtil.getFilePath(BASIC_SAVE_DIR + File.separator + yy + File.separator + mm + File.separator + dd + File.separator + hh + File.separator + other);
     }
 
     private boolean reback(IService service, String path, String name) {
